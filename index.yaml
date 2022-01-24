@@ -11,4 +11,14 @@ entries:
     urls:
     - https://github.com/xyctruth/istio-ratelimit/releases/download/istio-ratelimit-0.1.0/istio-ratelimit-0.1.0.tgz
     version: 0.1.0
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2022-01-24T08:28:07.218685466Z"
+    description: A Helm chart for Kubernetes
+    digest: 8e568cca2755531a6c1ddb694a5f5acdbb1d74d076098d16e3804d6f813e95bf
+    name: istio-ratelimit
+    type: application
+    urls:
+    - https://github.com/xyctruth/istio-ratelimit/releases/download/istio-ratelimit-0.0.1/istio-ratelimit-0.0.1.tgz
+    version: 0.0.1
 generated: "2022-01-24T07:50:37.367132896Z"
