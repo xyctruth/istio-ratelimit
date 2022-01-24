@@ -2,7 +2,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: ingressgateway-filter-ratelimit-svc
+  name: {{ include "istio-ratelimit.fullname" . }}-svc
   namespace: istio-system
 spec:
   workloadSelector:
@@ -29,41 +29,41 @@ spec:
 {{- range $rules }}
 {{- if .total}}
             - actions: # any actions in here
-              - header_value_match:
-                  descriptor_value: "{{ $name }}_{{ .path }}"
-                  expect_match: true
-                  headers:
-                    - name: ":path"
-                      prefix_match: "{{.path}}"
+                - header_value_match:
+                    descriptor_value: "{{ $name }}_{{ .path }}"
+                    expect_match: true
+                    headers:
+                      - name: ":path"
+                        prefix_match: "{{.path}}"
               stage: 0
 {{- end }}
 {{- if .token}}
             - actions: # any actions in here
-              - header_value_match:
-                  descriptor_value:  "{{ $name }}_{{ .path }}"
-                  expect_match: true
-                  headers:
-                    - name: ":path"
-                      prefix_match: "{{.path}}"
-              - request_headers:
-                  header_name: "x-token"
-                  descriptor_key: auth_token
+                - header_value_match:
+                    descriptor_value:  "{{ $name }}_{{ .path }}"
+                    expect_match: true
+                    headers:
+                      - name: ":path"
+                        prefix_match: "{{.path}}"
+                - request_headers:
+                    header_name: "x-token"
+                    descriptor_key: auth_token
               stage: 0
 {{- end }}
 {{- if .ip}}
             - actions: # any actions in here
-              - header_value_match:
-                  descriptor_value:  "{{ $name }}_{{ .path }}"
-                  expect_match: true
-                  headers:
-                    - name: ":path"
-                      prefix_match: "{{.path}}"
-              - header_value_match:
-                  descriptor_value: "no_auth"
-                  expect_match: false
-                  headers:
-                    - name: "x-token"
-              - remote_address: {}
+                - header_value_match:
+                    descriptor_value:  "{{ $name }}_{{ .path }}"
+                    expect_match: true
+                    headers:
+                      - name: ":path"
+                        prefix_match: "{{.path}}"
+                - header_value_match:
+                    descriptor_value: "no_auth"
+                    expect_match: false
+                    headers:
+                      - name: "x-token"
+                - remote_address: {}
               stage: 0
 {{- end }}
 {{- end }}
@@ -74,7 +74,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: ingressgateway-filter-ratelimit
+  name: {{ include "istio-ratelimit.fullname" . }}
   namespace: istio-system
 spec:
   workloadSelector:
@@ -111,7 +111,7 @@ spec:
     - applyTo: CLUSTER
       match:
         cluster:
-          service: ratelimit.prod-security.svc.cluster.local
+          service: {{ include "istio-ratelimit.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
       patch:
         operation: ADD
         # Adds the rate limit service cluster for rate limit service defined in step 1.
@@ -124,9 +124,9 @@ spec:
           load_assignment:
             cluster_name: rate_limit_cluster
             endpoints:
-            - lb_endpoints:
-              - endpoint:
-                  address:
-                     socket_address:
-                      address: ratelimit.prod-security.svc.cluster.local
-                      port_value: 8081
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: {{ include "istio-ratelimit.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+                          port_value: 8081

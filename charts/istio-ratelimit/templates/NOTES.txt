@@ -1,1 +1,4 @@
-notes:
+rate limits rule:
+
+{{toYaml .Values.rate_limits }}
+
