@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "istio-ratelimit.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "istio-ratelimit.fullname" . }}:8080']
   restartPolicy: Never
