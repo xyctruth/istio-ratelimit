@@ -1,0 +1,132 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ingressgateway-filter-ratelimit-svc
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+{{- range .Values.rate_limits }}
+{{$rules := .rules }}
+{{$name := .name }}
+{{- range .hosts }}
+    - applyTo: VIRTUAL_HOST
+      match:
+        context: GATEWAY
+        routeConfiguration:
+          vhost:
+            name: "{{.}}"
+            route:
+              action: ANY
+      patch:
+        operation: MERGE
+        # Applies the rate limit rules.
+        value:
+          rate_limits:
+{{- range $rules }}
+{{- if .total}}
+            - actions: # any actions in here
+              - header_value_match:
+                  descriptor_value: "{{ $name }}_{{ .path }}"
+                  expect_match: true
+                  headers:
+                    - name: ":path"
+                      prefix_match: "{{.path}}"
+              stage: 0
+{{- end }}
+{{- if .token}}
+            - actions: # any actions in here
+              - header_value_match:
+                  descriptor_value:  "{{ $name }}_{{ .path }}"
+                  expect_match: true
+                  headers:
+                    - name: ":path"
+                      prefix_match: "{{.path}}"
+              - request_headers:
+                  header_name: "x-token"
+                  descriptor_key: auth_token
+              stage: 0
+{{- end }}
+{{- if .ip}}
+            - actions: # any actions in here
+              - header_value_match:
+                  descriptor_value:  "{{ $name }}_{{ .path }}"
+                  expect_match: true
+                  headers:
+                    - name: ":path"
+                      prefix_match: "{{.path}}"
+              - header_value_match:
+                  descriptor_value: "no_auth"
+                  expect_match: false
+                  headers:
+                    - name: "x-token"
+              - remote_address: {}
+              stage: 0
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ingressgateway-filter-ratelimit
+  namespace: istio-system
+spec:
+  workloadSelector:
+    # select by label in the same namespace
+    labels:
+      istio: ingressgateway
+  configPatches:
+    # The Envoy config you want to modify
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
+      patch:
+        operation: INSERT_BEFORE
+        # Adds the Envoy Rate Limit Filter in HTTP filter chain.
+        value:
+          name: envoy.filters.http.ratelimit
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+            # domain can be anything! Match it to the ratelimter service config
+            domain: ingressgateway-ratelimit
+            failure_mode_deny: true
+            rate_limit_service:
+              grpc_service:
+                envoy_grpc:
+                  cluster_name: rate_limit_cluster
+                timeout: 10s
+              transport_api_version: V3
+    - applyTo: CLUSTER
+      match:
+        cluster:
+          service: ratelimit.prod-security.svc.cluster.local
+      patch:
+        operation: ADD
+        # Adds the rate limit service cluster for rate limit service defined in step 1.
+        value:
+          name: rate_limit_cluster
+          type: STRICT_DNS
+          connect_timeout: 10s
+          lb_policy: ROUND_ROBIN
+          http2_protocol_options: {}
+          load_assignment:
+            cluster_name: rate_limit_cluster
+            endpoints:
+            - lb_endpoints:
+              - endpoint:
+                  address:
+                     socket_address:
+                      address: ratelimit.prod-security.svc.cluster.local
+                      port_value: 8081
