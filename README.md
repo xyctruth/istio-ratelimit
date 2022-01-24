@@ -18,3 +18,30 @@ To install the <chart-name> chart:
 To uninstall the chart:
 
     helm delete my-istio-ratelimit
+
+## Rate limits configuration:
+
+`values.yaml`
+
+```yaml
+rate_limits:
+  - name: test_api
+    hosts:
+      - test.api.jia-huang.com:80
+      - test.api.jia-huang.com:443
+    rules:
+      - path: /
+        total:
+          limit_unit: second
+          limit_requests: 100
+        token:
+          limit_unit: second
+          limit_requests: 20
+        ip:
+          limit_unit: second
+          limit_requests: 20
+      - path: /f007dev/admin-gateway/pay/error_mapping/
+        token:
+          limit_unit: minute
+          limit_requests: 3
+```
