@@ -1,4 +1,6 @@
-rate limits rule:
 
-{{toYaml .Values.rate_limits }}
+Rate Limits Rule:
+
+configuration:
+  {{toYaml .Values.configuration }}
 

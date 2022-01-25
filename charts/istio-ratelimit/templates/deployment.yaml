@@ -5,33 +5,33 @@ metadata:
   labels:
     {{- include "istio-ratelimit.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.ratelimit.autoscaling.enabled }}
+  replicas: {{ .Values.ratelimit.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "istio-ratelimit.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.ratelimit.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "istio-ratelimit.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.ratelimit.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.ratelimit.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.ratelimit.securityContext | nindent 12 }}
+          image: "{{ .Values.ratelimit.image.repository }}:{{ .Values.ratelimit.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ratelimit.image.pullPolicy }}
           command: ["/bin/ratelimit"]
           env:
             - name: LOG_LEVEL
@@ -39,9 +39,9 @@ spec:
             - name: REDIS_SOCKET_TYPE
               value: tcp
             - name: REDIS_URL
-              value: redis-master.dev-middleware:6379
+              value: {{ include "istio-ratelimit.fullname" . }}-redis-master:6379
             - name: REDIS_AUTH
-              value: UZ23jFR3N7
+              value:  {{ .Values.redis.password }}
             - name: USE_STATSD
               value: "false"
             - name: RUNTIME_ROOT
@@ -60,16 +60,16 @@ spec:
             - name: config-volume
               mountPath: /data/ratelimit/config
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.ratelimit.resources | nindent 12 }}
+      {{- with .Values.ratelimit.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.ratelimit.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.ratelimit.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
