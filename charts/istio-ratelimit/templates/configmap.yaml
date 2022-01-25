@@ -25,13 +25,10 @@ data:
               requests_per_unit: {{ .token.limit_requests }}
          {{- end }}
          {{- if .ip}}
-          - key: header_match
-            value: "no_auth"
-            descriptors:
-              - key: remote_address
-                rate_limit:
-                  unit: {{ .ip.limit_unit }}
-                  requests_per_unit: {{ .ip.limit_requests }}
+          - key: remote_address
+            rate_limit:
+              unit: {{ .ip.limit_unit }}
+              requests_per_unit: {{ .ip.limit_requests }}
           {{- end }}
         {{- end }}
       {{- end }}

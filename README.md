@@ -25,7 +25,7 @@ To uninstall the chart:
 
 ```yaml
 configuration:
-  - name: test_api
+  - name: group1
     hosts:
       - test.api.jia-huang.com:80
       - test.api.jia-huang.com:443
@@ -34,15 +34,22 @@ configuration:
         total:
           limit_unit: second
           limit_requests: 100
-        token:
-          header_name: "x-token-1"
-          limit_unit: second
-          limit_requests: 20
         ip:
           limit_unit: second
           limit_requests: 20
-      - path: /f007dev/admin-gateway/pay/error_mapping/
         token:
+          header_name: "x-token"
+          limit_unit: second
+          limit_requests: 20
+      - path: /f007dev/admin-gateway/pay/error_mapping/
+        total:
           limit_unit: minute
-          limit_requests: 3
+          limit_requests: 50
+        ip:
+          limit_unit: minute
+          limit_requests: 10
+        token:
+          header_name: "x-token"
+          limit_unit: minute
+          limit_requests: 5
 ```
