@@ -34,15 +34,22 @@ configuration:
         total:
           limit_unit: second
           limit_requests: 100
-        token:
-          header_name: "token"
-          limit_unit: second
-          limit_requests: 20
         ip:
           limit_unit: second
           limit_requests: 20
-      - path: /f007dev/admin-gateway/pay/error_mapping/
         token:
+          header_name: "x-token"
+          limit_unit: second
+          limit_requests: 20
+      - path: /f007dev/admin-gateway/pay/error_mapping/
+        total:
           limit_unit: minute
-          limit_requests: 3
+          limit_requests: 50
+        ip:
+          limit_unit: minute
+          limit_requests: 10
+        token:
+          header_name: "x-token"
+          limit_unit: minute
+          limit_requests: 5
 ```
