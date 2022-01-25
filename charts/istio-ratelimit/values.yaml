@@ -3,26 +3,33 @@
 # Declare variables to be passed into your templates.
 
 configuration:
-  - name: group1
-    hosts:
-      - test.api.jia-huang.com:80
-      - test.api.jia-huang.com:443
-    rules:
-      - path: /
-        total:
-          limit_unit: second
-          limit_requests: 100
-        token:
-          header_name: "token"
-          limit_unit: second
-          limit_requests: 20
-        ip:
-          limit_unit: second
-          limit_requests: 20
-      - path: /f007dev/admin-gateway/pay/error_mapping/
-        token:
-          limit_unit: minute
-          limit_requests: 3
+#  - name: group1
+#    hosts:
+#      - test.api.jia-huang.com:80
+#      - test.api.jia-huang.com:443
+#    rules:
+#      - path: /
+#        total:
+#          limit_unit: second
+#          limit_requests: 100
+#        ip:
+#          limit_unit: second
+#          limit_requests: 20
+#        token:
+#          header_name: "x-token"
+#          limit_unit: second
+#          limit_requests: 20
+#      - path: /f007dev/admin-gateway/pay/error_mapping/
+#        total:
+#          limit_unit: minute
+#          limit_requests: 50
+#        ip:
+#          limit_unit: minute
+#          limit_requests: 10
+#        token:
+#          header_name: "x-token"
+#          limit_unit: minute
+#          limit_requests: 5
 
 ratelimit:
   image:
@@ -75,8 +82,8 @@ ratelimit:
 
 redis:
   install: true
-  usePassword: true
-  password: UZ23jFR3N7
+  usePassword: false
+  # password: UZ23jFR3N7
   cluster:
     enabled: false
   metrics:

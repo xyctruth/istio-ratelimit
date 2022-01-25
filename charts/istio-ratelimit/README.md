@@ -24,8 +24,8 @@ To uninstall the chart:
 `values.yaml`
 
 ```yaml
-rate_limits:
-  - name: test_api
+configuration:
+  - name: group1
     hosts:
       - test.api.jia-huang.com:80
       - test.api.jia-huang.com:443
@@ -35,6 +35,7 @@ rate_limits:
           limit_unit: second
           limit_requests: 100
         token:
+          header_name: "token"
           limit_unit: second
           limit_requests: 20
         ip:

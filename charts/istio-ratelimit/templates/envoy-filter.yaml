@@ -47,7 +47,7 @@ spec:
                       - name: ":path"
                         prefix_match: "{{.path}}"
                 - request_headers:
-                    header_name: "{{.token.header_name}}"
+                    header_name: "{{- include "istio-ratelimit.tokenHeaderName" . }}"
                     descriptor_key: auth_token
               stage: 0
            {{- end }}
@@ -59,13 +59,6 @@ spec:
                     headers:
                       - name: ":path"
                         prefix_match: "{{.path}}"
-               {{- if .token}}
-                - header_value_match:
-                    descriptor_value: "no_auth"
-                    expect_match: false
-                    headers:
-                      - name: "{{.token.header_name}}"
-                {{- end}}
                 - remote_address: {}
               stage: 0
            {{- end }}

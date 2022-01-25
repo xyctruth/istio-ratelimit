@@ -40,8 +40,10 @@ spec:
               value: tcp
             - name: REDIS_URL
               value: {{ include "istio-ratelimit.fullname" . }}-redis-master:6379
+            {{- if .Values.redis.usePassword }}
             - name: REDIS_AUTH
               value:  {{ .Values.redis.password }}
+            {{- end }}
             - name: USE_STATSD
               value: "false"
             - name: RUNTIME_ROOT
