@@ -1,5 +1,5 @@
 configuration:
-  - name: test_api
+  - name: group1
     hosts:
       - test.api.jia-huang.com:80
       - test.api.jia-huang.com:443
