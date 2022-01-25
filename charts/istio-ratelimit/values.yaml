@@ -2,8 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# second,minute,hour
-rate_limits:
+configuration:
 #  - name: test_api
 #    hosts:
 #      - test.api.jia-huang.com:80
@@ -14,6 +13,7 @@ rate_limits:
 #          limit_unit: second
 #          limit_requests: 100
 #        token:
+#          header_name: "token"
 #          limit_unit: second
 #          limit_requests: 20
 #        ip:
@@ -24,54 +24,63 @@ rate_limits:
 #          limit_unit: minute
 #          limit_requests: 3
 
+ratelimit:
+  image:
+    repository: envoyproxy/ratelimit
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "4d2efd61"
+  replicaCount: 1
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
 
-replicaCount: 1
+  podAnnotations: {}
 
-image:
-  repository: envoyproxy/ratelimit
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "4d2efd61"
+  podSecurityContext: {}
+    # fsGroup: 2000
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
 
-podAnnotations: {}
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
 
-podSecurityContext: {}
-  # fsGroup: 2000
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  nodeSelector: {}
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  tolerations: []
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  affinity: {}
 
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
+redis:
+  install: true
+  usePassword: true
+  password: UZ23jFR3N7
+  cluster:
+    enabled: false
+  metrics:
+    enabled: false
+  master:
+    persistence:
+      enabled: false

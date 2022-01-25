@@ -1,5 +1,5 @@
 ---
-{{- if .Values.rate_limits }}
+{{- if .Values.configuration }}
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
@@ -10,10 +10,10 @@ spec:
     labels:
       istio: ingressgateway
   configPatches:
-{{- range .Values.rate_limits }}
-{{$rules := .rules }}
-{{$name := .name }}
-{{- range .hosts }}
+  {{- range .Values.configuration }}
+    {{$rules := .rules }}
+    {{$name := .name }}
+    {{- range .hosts }}
     - applyTo: VIRTUAL_HOST
       match:
         context: GATEWAY
@@ -27,8 +27,8 @@ spec:
         # Applies the rate limit rules.
         value:
           rate_limits:
-{{- range $rules }}
-{{- if .total}}
+          {{- range $rules }}
+            {{- if .total}}
             - actions: # any actions in here
                 - header_value_match:
                     descriptor_value: "{{ $name }}_{{ .path }}"
@@ -37,8 +37,8 @@ spec:
                       - name: ":path"
                         prefix_match: "{{.path}}"
               stage: 0
-{{- end }}
-{{- if .token}}
+            {{- end }}
+            {{- if .token}}
             - actions: # any actions in here
                 - header_value_match:
                     descriptor_value:  "{{ $name }}_{{ .path }}"
@@ -47,11 +47,11 @@ spec:
                       - name: ":path"
                         prefix_match: "{{.path}}"
                 - request_headers:
-                    header_name: "x-token"
+                    header_name: "{{.token.header_name}}"
                     descriptor_key: auth_token
               stage: 0
-{{- end }}
-{{- if .ip}}
+           {{- end }}
+           {{- if .ip}}
             - actions: # any actions in here
                 - header_value_match:
                     descriptor_value:  "{{ $name }}_{{ .path }}"
@@ -59,17 +59,19 @@ spec:
                     headers:
                       - name: ":path"
                         prefix_match: "{{.path}}"
+               {{- if .token}}
                 - header_value_match:
                     descriptor_value: "no_auth"
                     expect_match: false
                     headers:
-                      - name: "x-token"
+                      - name: "{{.token.header_name}}"
+                {{- end}}
                 - remote_address: {}
               stage: 0
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
+           {{- end }}
+         {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 ---
