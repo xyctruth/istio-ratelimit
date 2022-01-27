@@ -28,7 +28,7 @@ The policies should be configured in `values.yaml`
 | Key            | Type   | Description                                                                                                                                                  | 
 |----------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | key            | string | Policy Unique Identifier                                                                                                                                     |
-| hosts          | array  | Matches the istio gateway host， Need to use port to distinguish between http and https ,(api.xyctruth.com:80,api.xyctruth.com:443).                          |
+| hosts          | array  | Matches the istio gateway host, Need to use port to distinguish between http and https ,(api.xyctruth.com:80,api.xyctruth.com:443).                          |
 | path           | array  | Each path object has a separate flow limit count                                                                                                             |
 | paths.type     | string | Matches the type of path  One of: (`prefix_match`,`contains_match`)                                                                                          |
 | paths.value    | string | Matches the value                                                                                                                                            |
@@ -41,7 +41,7 @@ The policies should be configured in `values.yaml`
 
 ```yaml
 policies:
-  - name: group1
+  - key: group1
     hosts:
       - test.api.xyctruth.com:80
       - test.api.xyctruth.com:443
@@ -50,17 +50,17 @@ policies:
         value: /
     limit_unit: second
     limit_requests: 100
-    rules:
+    strategy:
       - type: ip
         limit_unit: second
         limit_requests: 50
       - type: header
-        header: "x-token"
+        value: "x-token"
         limit_unit: second
         limit_requests: 10
 
 
-  - name: group2
+  - key: group2
     hosts:
       - test.api.xyctruth.com:80
     paths:
@@ -70,14 +70,12 @@ policies:
         value: /pay/method
     limit_unit: second
     limit_requests: 100
-    rules:
+    strategy:
       - type: ip
         limit_unit: second
         limit_requests: 50
       - type: header
-        header: "x-token"
+        value: "x-token"
         limit_unit: minute
         limit_requests: 5
-
-
 ```
