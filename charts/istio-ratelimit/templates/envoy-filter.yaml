@@ -11,8 +11,8 @@ spec:
       istio: ingressgateway
   configPatches:
   {{- range .Values.policies }}
-    {{$rules := .rules }}
-    {{$name := .name }}
+    {{$strategy := .strategy }}
+    {{$key := .key }}
     {{$hosts := .hosts }}
     {{$paths := .paths }}
     {{- range $hosts }}
@@ -34,34 +34,34 @@ spec:
           rate_limits:
             - actions: # any actions in here
                 - header_value_match:
-                    descriptor_value: "{{ $name }}_{{ $path }}"
+                    descriptor_value: "{{ $key }}_{{ $path.type }}_{{ $path.value }}"
                     expect_match: true
                     headers:
                       - name: ":path"
-                        prefix_match: "{{$path}}"
+                        {{ $path.type }}: "{{ $path.value }}"
               stage: 0
-          {{- range $rules }}
+          {{- range $strategy }}
             {{- if eq .type "header" }}
             - actions: # any actions in here
                 - header_value_match:
-                    descriptor_value:  "{{ $name }}_{{ $path }}"
+                    descriptor_value:  "{{ $key }}_{{ $path.type }}_{{ $path.value }}"
                     expect_match: true
                     headers:
                       - name: ":path"
-                        prefix_match: "{{$path}}"
+                        {{ $path.type }}: "{{ $path.value }}"
                 - request_headers:
-                    header_name: "{{ .header }}"
-                    descriptor_key:  "header_{{ .header }}"
+                    header_name: "{{ .value }}"
+                    descriptor_key:  "header_{{ .value }}"
               stage: 0
            {{- end }}
            {{- if eq .type "ip"}}
             - actions: # any actions in here
                 - header_value_match:
-                    descriptor_value:  "{{ $name }}_{{ $path }}"
+                    descriptor_value: "{{ $key }}_{{ $path.type }}_{{ $path.value }}"
                     expect_match: true
                     headers:
                       - name: ":path"
-                        prefix_match: "{{$path}}"
+                        {{ $path.type }}: "{{ $path.value }}"
                 - remote_address: {}
               stage: 0
            {{- end }}

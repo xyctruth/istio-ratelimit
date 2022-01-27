@@ -7,22 +7,22 @@ data:
     domain: ingressgateway-ratelimit
     descriptors:
 {{- range .Values.policies }}
-  {{$name := .name }}
-  {{$rules := .rules }}
+  {{$key := .key }}
+  {{$strategy := .strategy }}
   {{$limit_unit := .limit_unit }}
   {{$limit_requests := .limit_requests }}
   {{- range .paths }}
     {{$path := . }}
       - key: header_match
-        value: "{{ $name }}_{{ $path }}"
+        value: "{{ $key }}_{{ $path.type }}_{{ $path.value }}"
         rate_limit:
           unit: {{ $limit_unit }}
           requests_per_unit: {{ $limit_requests }}
+    {{- if $strategy }}
         descriptors:
-      {{- range $rules }}
-        {{- if or (eq .type "header")  (eq .type "ip") }}
+      {{- range $strategy }}
          {{- if eq .type "header" }}
-          - key: "header_{{ .header }}"
+          - key: "header_{{ .value }}"
             rate_limit:
               unit: {{ .limit_unit }}
               requests_per_unit: {{ .limit_requests }}
@@ -34,6 +34,6 @@ data:
               requests_per_unit: {{ .limit_requests }}
           {{- end }}
         {{- end }}
-      {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}

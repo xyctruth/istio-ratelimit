@@ -1,16 +1,39 @@
 policies:
-  - name: group1
+  - key: group1
     hosts:
-      - test.api.jia-huang.com:80
+      - test.api.xyctruth.com:80
+      - test.api.xyctruth.com:443
     paths:
-      - /
-    limit_unit: minute
-    limit_requests: 10
-    rules:
+      - type: prefix_match
+        value: /
+    limit_unit: second
+    limit_requests: 100
+    strategy:
       - type: ip
+        limit_unit: second
+        limit_requests: 50
+      - type: header
+        value: "x-token"
+        limit_unit: second
+        limit_requests: 10
+
+
+  - key: group2
+    hosts:
+      - test.api.xyctruth.com:80
+    paths:
+      - type: contains_match
+        value: /pay/error_mapping
+      - type: contains_match
+        value: /pay/method
+    limit_unit: second
+    limit_requests: 100
+    strategy:
+      - type: ip
+        limit_unit: second
+        limit_requests: 50
+      - type: header
+        value: "x-token"
         limit_unit: minute
         limit_requests: 5
-      - type: header
-        header: "x-token"
-        limit_unit: minute
-        limit_requests: 2
+

@@ -21,37 +21,63 @@ To uninstall the chart:
 
     helm delete my-istio-ratelimit
 
-## Rate limits configuration:
+## Rate limits policies:
 
-`values.yaml`
+The policies should be configured in `values.yaml`
+
+| Key            | Type   | Description                                                                                                                                                  | 
+|----------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| key            | string | Policy Unique Identifier                                                                                                                                     |
+| hosts          | array  | Matches the istio gateway host， Need to use port to distinguish between http and https ,(api.xyctruth.com:80,api.xyctruth.com:443).                          |
+| path           | array  | Each path object has a separate flow limit count                                                                                                             |
+| paths.type     | string | Matches the type of path  One of: (`prefix_match`,`contains_match`)                                                                                          |
+| paths.value    | string | Matches the value                                                                                                                                            |
+| limit_unit     | string | Rate limit unit , One of: (`second`,`minute`,`hour`,`day`)                                                                                                   |
+| limit_requests | int    | Rate limit request count                                                                                                                                     |
+| strategy       | array  | Further set rate limit strategy                                                                                                                              |
+| strategy.type  | string | Further rate limit strategy type， One of: (`header`,`ip`) , <br/>`header`: Header Matches the Request Header  ,<br/>`ip`: Ip   Matches the Request Remote IP |
+
+example ：
 
 ```yaml
-configuration:
+policies:
   - name: group1
     hosts:
-      - test.api.jia-huang.com:80
-      - test.api.jia-huang.com:443
+      - test.api.xyctruth.com:80
+      - test.api.xyctruth.com:443
+    paths:
+      - type: prefix_match
+        value: /
+    limit_unit: second
+    limit_requests: 100
     rules:
-      - path: /
-        total:
-          limit_unit: second
-          limit_requests: 100
-        ip:
-          limit_unit: second
-          limit_requests: 20
-        token:
-          header_name: "x-token"
-          limit_unit: second
-          limit_requests: 20
-      - path: /f007dev/admin-gateway/pay/error_mapping/
-        total:
-          limit_unit: minute
-          limit_requests: 50
-        ip:
-          limit_unit: minute
-          limit_requests: 10
-        token:
-          header_name: "x-token"
-          limit_unit: minute
-          limit_requests: 5
+      - type: ip
+        limit_unit: second
+        limit_requests: 50
+      - type: header
+        header: "x-token"
+        limit_unit: second
+        limit_requests: 10
+
+
+  - name: group2
+    hosts:
+      - test.api.xyctruth.com:80
+    paths:
+      - type: contains_match
+        value: /pay/error_mapping
+      - type: contains_match
+        value: /pay/method
+    limit_unit: second
+    limit_requests: 100
+    rules:
+      - type: ip
+        limit_unit: second
+        limit_requests: 50
+      - type: header
+        header: "x-token"
+        limit_unit: minute
+        limit_requests: 5
+
+
 ```

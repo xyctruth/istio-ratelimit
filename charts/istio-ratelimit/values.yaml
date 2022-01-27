@@ -4,6 +4,24 @@
 
 # limit rate policies
 policies: {}
+#  - key: group1
+#    hosts:
+#      - test.api.xyctruth.com:80
+#      - test.api.xyctruth.com:443
+#    paths:
+#      - type: prefix_match
+#        value: /
+#    limit_unit: second
+#    limit_requests: 100
+#    strategy:
+#      - type: ip
+#        limit_unit: second
+#        limit_requests: 50
+#      - type: header
+#        value: "x-token"
+#        limit_unit: second
+#        limit_requests: 10
+
 
 ratelimit:
   image:
