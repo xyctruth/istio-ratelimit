@@ -6,30 +6,34 @@ data:
   ingressgateway-ratelimit.yaml: |-
     domain: ingressgateway-ratelimit
     descriptors:
-    {{- range .Values.configuration }}
-      {{$name := .name }}
-      {{- range .rules }}
+{{- range .Values.policies }}
+  {{$key := .key }}
+  {{$strategy := .strategy }}
+  {{$limit_unit := .limit_unit }}
+  {{$limit_requests := .limit_requests }}
+  {{- range .paths }}
+    {{$path := . }}
       - key: header_match
-        value: "{{ $name }}_{{ .path }}"
-        {{- if .total}}
+        value: "{{ $key }}_{{ $path.type }}_{{ $path.value }}"
         rate_limit:
-          unit: {{ .total.limit_unit }}
-          requests_per_unit: {{ .total.limit_requests }}
-        {{- end }}
-        {{- if or .token .ip }}
+          unit: {{ $limit_unit }}
+          requests_per_unit: {{ $limit_requests }}
+    {{- if $strategy }}
         descriptors:
-         {{- if .token}}
-          - key: auth_token
+      {{- range $strategy }}
+         {{- if eq .type "header" }}
+          - key: "header_{{ .value }}"
             rate_limit:
-              unit: {{ .token.limit_unit }}
-              requests_per_unit: {{ .token.limit_requests }}
+              unit: {{ .limit_unit }}
+              requests_per_unit: {{ .limit_requests }}
          {{- end }}
-         {{- if .ip}}
+         {{- if eq .type "ip"}}
           - key: remote_address
             rate_limit:
-              unit: {{ .ip.limit_unit }}
-              requests_per_unit: {{ .ip.limit_requests }}
+              unit: {{ .limit_unit }}
+              requests_per_unit: {{ .limit_requests }}
           {{- end }}
         {{- end }}
-      {{- end }}
     {{- end }}
+  {{- end }}
+{{- end }}

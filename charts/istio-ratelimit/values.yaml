@@ -2,34 +2,26 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-configuration:
-#  - name: group1
+# limit rate policies
+policies: {}
+#  - key: group1
 #    hosts:
-#      - test.api.jia-huang.com:80
-#      - test.api.jia-huang.com:443
-#    rules:
-#      - path: /
-#        total:
-#          limit_unit: second
-#          limit_requests: 100
-#        ip:
-#          limit_unit: second
-#          limit_requests: 20
-#        token:
-#          header_name: "x-token"
-#          limit_unit: second
-#          limit_requests: 20
-#      - path: /f007dev/admin-gateway/pay/error_mapping/
-#        total:
-#          limit_unit: minute
-#          limit_requests: 50
-#        ip:
-#          limit_unit: minute
-#          limit_requests: 10
-#        token:
-#          header_name: "x-token"
-#          limit_unit: minute
-#          limit_requests: 5
+#      - test.api.xyctruth.com:80
+#      - test.api.xyctruth.com:443
+#    paths:
+#      - type: prefix_match
+#        value: /
+#    limit_unit: second
+#    limit_requests: 100
+#    strategy:
+#      - type: ip
+#        limit_unit: second
+#        limit_requests: 50
+#      - type: header
+#        value: "x-token"
+#        limit_unit: second
+#        limit_requests: 10
+
 
 ratelimit:
   image:

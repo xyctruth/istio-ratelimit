@@ -2,5 +2,5 @@
 Rate Limits Rule:
 
 configuration:
-  {{toYaml .Values.configuration }}
+  {{toYaml .Values.policies }}
 

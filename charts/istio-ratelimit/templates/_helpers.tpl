@@ -51,9 +51,4 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 
-{{/*
-header_name token
-*/}}
-{{- define "istio-ratelimit.tokenHeaderName" -}}
-{{ .token.header_name | default "token" }}
-{{- end }}
+
