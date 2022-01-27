@@ -3,6 +3,21 @@ entries:
   istio-ratelimit:
   - apiVersion: v2
     appVersion: 4d2efd61
+    created: "2022-01-27T09:36:24.100511124Z"
+    dependencies:
+    - condition: redis.install
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.3.4
+    description: A Helm chart for Kubernetes
+    digest: c52db24f118b7a1d6ded1b5eab6280a7fc159d3e402f08f10af8c1754cf1ae1d
+    name: istio-ratelimit
+    type: application
+    urls:
+    - https://github.com/xyctruth/istio-ratelimit/releases/download/istio-ratelimit-0.0.3/istio-ratelimit-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: 4d2efd61
     created: "2022-01-26T10:54:23.286398622Z"
     dependencies:
     - condition: redis.install
