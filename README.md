@@ -37,7 +37,7 @@ The policies should be configured in `values.yaml`
 | strategy       | array  | Further set rate limit strategy                                                                                                                              |
 | strategy.type  | string | Further rate limit strategy type， One of: (`header`,`ip`) , <br/>`header`: Header Matches the Request Header  ,<br/>`ip`: Ip   Matches the Request Remote IP |
 
-example ：
+### Example 1
 
 ```yaml
 policies:
