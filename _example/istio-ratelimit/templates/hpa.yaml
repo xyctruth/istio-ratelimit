@@ -1,0 +1,28 @@
+{{- if .Values.ratelimit.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "istio-ratelimit.fullname" . }}
+  labels:
+    {{- include "istio-ratelimit.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "istio-ratelimit.fullname" . }}
+  minReplicas: {{ .Values.ratelimit.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.ratelimit.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.ratelimit.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.ratelimit.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.ratelimit.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.ratelimit.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

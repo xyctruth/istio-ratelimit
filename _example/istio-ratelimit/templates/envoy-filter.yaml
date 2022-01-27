@@ -1,5 +1,5 @@
 ---
-{{- if .Values.policies }}
+{{- if .Values.configuration }}
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
@@ -10,21 +10,16 @@ spec:
     labels:
       istio: ingressgateway
   configPatches:
-  {{- range .Values.policies }}
+  {{- range .Values.configuration }}
     {{$rules := .rules }}
     {{$name := .name }}
-    {{$hosts := .hosts }}
-    {{$paths := .paths }}
-    {{- range $hosts }}
-      {{$host := . }}
-    {{- range $paths }}
-      {{$path := . }}
+    {{- range .hosts }}
     - applyTo: VIRTUAL_HOST
       match:
         context: GATEWAY
         routeConfiguration:
           vhost:
-            name: "{{$host}}"
+            name: "{{.}}"
             route:
               action: ANY
       patch:
@@ -32,41 +27,42 @@ spec:
         # Applies the rate limit rules.
         value:
           rate_limits:
-            - actions: # any actions in here
-                - header_value_match:
-                    descriptor_value: "{{ $name }}_{{ $path }}"
-                    expect_match: true
-                    headers:
-                      - name: ":path"
-                        prefix_match: "{{$path}}"
-              stage: 0
           {{- range $rules }}
-            {{- if eq .type "header" }}
+            {{- if .total}}
             - actions: # any actions in here
                 - header_value_match:
-                    descriptor_value:  "{{ $name }}_{{ $path }}"
+                    descriptor_value: "{{ $name }}_{{ .path }}"
                     expect_match: true
                     headers:
                       - name: ":path"
-                        prefix_match: "{{$path}}"
+                        prefix_match: "{{.path}}"
+              stage: 0
+            {{- end }}
+            {{- if .token}}
+            - actions: # any actions in here
+                - header_value_match:
+                    descriptor_value:  "{{ $name }}_{{ .path }}"
+                    expect_match: true
+                    headers:
+                      - name: ":path"
+                        prefix_match: "{{.path}}"
                 - request_headers:
-                    header_name: "{{ .header }}"
-                    descriptor_key:  "header_{{ .header }}"
+                    header_name: "{{- include "istio-ratelimit.tokenHeaderName" . }}"
+                    descriptor_key: auth_token
               stage: 0
            {{- end }}
-           {{- if eq .type "ip"}}
+           {{- if .ip}}
             - actions: # any actions in here
                 - header_value_match:
-                    descriptor_value:  "{{ $name }}_{{ $path }}"
+                    descriptor_value:  "{{ $name }}_{{ .path }}"
                     expect_match: true
                     headers:
                       - name: ":path"
-                        prefix_match: "{{$path}}"
+                        prefix_match: "{{.path}}"
                 - remote_address: {}
               stage: 0
            {{- end }}
          {{- end }}
-    {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}

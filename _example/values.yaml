@@ -1,27 +1,16 @@
-configuration:
+policies:
   - name: group1
     hosts:
       - test.api.jia-huang.com:80
+    paths:
+      - /
+    limit_unit: minute
+    limit_requests: 10
     rules:
-      - path: /
-        total:
-          limit_unit: second
-          limit_requests: 100
-        ip:
-          limit_unit: second
-          limit_requests: 20
-        token:
-          header_name: "x-token"
-          limit_unit: second
-          limit_requests: 20
-      - path: /f007dev/admin-gateway/pay/error_mapping/
-        total:
-          limit_unit: minute
-          limit_requests: 50
-        ip:
-          limit_unit: minute
-          limit_requests: 10
-        token:
-          header_name: "x-token"
-          limit_unit: minute
-          limit_requests: 5
+      - type: ip
+        limit_unit: minute
+        limit_requests: 5
+      - type: header
+        header: "x-token"
+        limit_unit: minute
+        limit_requests: 2
