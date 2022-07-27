@@ -28,7 +28,7 @@ The policies should be configured in `values.yaml`
 | Key            | Type   | Description                                                                                                                                                  | 
 |----------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | key            | string | Policy Unique Identifier                                                                                                                                     |
-| hosts          | array  | Matches the istio gateway host, Need to use port to distinguish between http and https ,(api.xyctruth.com:80,api.xyctruth.com:443).                          |
+| hosts          | array  | Matches the istio gateway host, Need to use port to distinguish between http and https, (api.xyctruth.com:80,api.xyctruth.com:443).                          |
 | path           | array  | Each path object has a separate flow limit count                                                                                                             |
 | paths.type     | string | Matches the type of path  One of: (`prefix_match`,`contains_match`)                                                                                          |
 | paths.value    | string | Matches the value                                                                                                                                            |
