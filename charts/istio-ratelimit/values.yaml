@@ -33,6 +33,7 @@ ratelimit:
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
+  command: ["/bin/ratelimit"]
 
   podAnnotations: {}
 
