@@ -25,6 +25,6 @@ appVersion: "4d2efd61"
 
 dependencies:
   - name: redis
-    version: 11.3.4
+    version: 17.11.3
     repository: https://charts.bitnami.com/bitnami
     condition: redis.install
