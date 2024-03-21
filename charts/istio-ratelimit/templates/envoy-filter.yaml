@@ -108,6 +108,9 @@ spec:
                   cluster_name: rate_limit_cluster
                 timeout: 0.25s
               transport_api_version: V3
+            body:
+              inline_string: "请求过多"
+            status_code: 455
     - applyTo: CLUSTER
       match:
         cluster:
