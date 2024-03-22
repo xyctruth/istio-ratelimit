@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # limit rate policies
-policies: {}
+policies: 
 #  - key: group1
 #    hosts:
 #      - test.api.xyctruth.com:80
