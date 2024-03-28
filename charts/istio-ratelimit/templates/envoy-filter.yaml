@@ -108,6 +108,32 @@ spec:
                   cluster_name: rate_limit_cluster
                 timeout: 0.25s
               transport_api_version: V3
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.ratelimit"
+      patch:
+        operation: INSERT_AFTER
+        value:
+          name: envoy.lua
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+            inlineCode: |
+              function envoy_on_response(response_handle)
+                if response_handle:headers():get(":status") == "429" then
+                  response_handle:headers():add("lua", "aaaa6")
+                  response_handle:headers():replace(":status", {{ .Values.ratelimit.customResponse.status }})
+                  response_handle:body(true):setBytes('{{ .Values.ratelimit.customResponse.body }}')
+                  response_handle:headers():replace("content-type", "{{ .Values.ratelimit.customResponse.contentType }}")
+                else
+                  response_handle:headers():add("lua", "bbbb")
+                end
+              end
     - applyTo: CLUSTER
       match:
         cluster:

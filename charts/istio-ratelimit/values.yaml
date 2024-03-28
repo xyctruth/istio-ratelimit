@@ -4,6 +4,23 @@
 
 # limit rate policies
 policies: 
+  - key: group1
+    hosts:
+      - hw-api-fat.tanjingmama.cn:80
+      - hw-api-fat.tanjingmama.cn:443
+    paths:
+      - type: prefix_match
+        value: /kfpt-net-bg
+    limit_unit: minute
+    limit_requests: 5
+    strategy:
+      - type: ip
+        limit_unit: minute
+        limit_requests: 5
+      - type: header
+        value: "x-token"
+        limit_unit: minute
+        limit_requests: 5
 #  - key: group1
 #    hosts:
 #      - test.api.xyctruth.com:80
@@ -24,6 +41,11 @@ policies:
 
 
 ratelimit:
+  customResponse:
+    status: 203
+    body: "{\"msg\":\"被限流了111\"}"
+    contentType: "application/json"
+
   image:
     repository: envoyproxy/ratelimit
     pullPolicy: IfNotPresent
