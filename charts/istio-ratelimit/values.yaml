@@ -42,8 +42,8 @@ policies:
 
 customResponse:
   enabled: true
-  status: 205
-  body: "{\"msg\":\"被限流了123\"}"
+  status: 429
+  body: "{\"msg\":\"the request is limited\"}"
   contentType: "application/json"
 
 ratelimit:

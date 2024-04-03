@@ -127,12 +127,12 @@ spec:
             inlineCode: |
               function envoy_on_response(response_handle)
                 if response_handle:headers():get(":status") == "429" then
-                  response_handle:headers():add("lua", "aaaa6")
+                  response_handle:headers():add("ratelimit", "true")
                   response_handle:headers():replace(":status", {{ .Values.customResponse.status }})
                   response_handle:body(true):setBytes('{{ .Values.customResponse.body }}')
                   response_handle:headers():replace("content-type", "{{ .Values.customResponse.contentType }}")
                 else
-                  response_handle:headers():add("lua", "bbbb")
+                  response_handle:headers():add("ratelimit", "false")
                 end
               end
 {{- end }}

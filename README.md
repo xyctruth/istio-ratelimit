@@ -1,5 +1,7 @@
 # istio-ratelimit
 
+ Global istio gateway rate limiting implemented with EnvoyFilter and envoyproxy/ratelimit, supporting the setting of custom responses. 
+
 ## Usage
 
 [Helm](https://helm.sh) must be installed to use the charts.  Please refer to
