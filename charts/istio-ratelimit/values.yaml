@@ -40,12 +40,13 @@ policies:
 #        limit_requests: 10
 
 
-ratelimit:
-  customResponse:
-    status: 203
-    body: "{\"msg\":\"被限流了111\"}"
-    contentType: "application/json"
+customResponse:
+  enabled: true
+  status: 205
+  body: "{\"msg\":\"被限流了123\"}"
+  contentType: "application/json"
 
+ratelimit:
   image:
     repository: envoyproxy/ratelimit
     pullPolicy: IfNotPresent
