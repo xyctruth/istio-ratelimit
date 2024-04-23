@@ -125,7 +125,15 @@ spec:
           typed_config:
             "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
             inlineCode: |
+              function envoy_on_request(request_handle)
+                local host = request_handle:headers():get(":authority")
+                if host then
+                  request_handle:streamInfo():dynamicMetadata():set("envoy.lua", "request_host", host)
+                end
+              end
               function envoy_on_response(response_handle)
+                local host = response_handle:streamInfo():dynamicMetadata():get("envoy.lua")["request_host"]
+                response_handle:headers():add("request_host", host)
                 if response_handle:headers():get(":status") == "429" then
                   response_handle:headers():add("ratelimit", "true")
                   response_handle:headers():replace(":status", {{ .Values.customResponse.status }})
@@ -157,4 +165,4 @@ spec:
                       address:
                         socket_address:
                           address: {{ include "istio-ratelimit.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-                          port_value: 8081        
+                          port_value: 8081
